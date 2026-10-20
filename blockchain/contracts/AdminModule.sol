@@ -46,4 +46,12 @@ contract AdminModule {
         require(reportId < reports.length, "Invalid report ID");
         return reports[reportId];
     }
+    function isApprovedManufacturer(address account)
+    external
+    view
+    returns (bool)
+{
+    return participants[account].role == Role.Manufacturer
+        && participants[account].active;
+}
 }

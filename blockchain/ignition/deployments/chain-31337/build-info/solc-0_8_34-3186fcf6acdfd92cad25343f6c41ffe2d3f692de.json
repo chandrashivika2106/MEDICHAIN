@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-3186fcf6acdfd92cad25343f6c41ffe2d3f692de",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.16.0"
+  },
+  "userSourceNameMap": {
+    "contracts/PharmacyModule.sol": "project/contracts/PharmacyModule.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/PharmacyModule.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\n/// @notice Standalone pharmacy receipt and sale-status log for MediChain.\r\n/// @dev Additive only; it does not modify the existing medicine registry.\r\ncontract PharmacyModule {\r\n    address public owner;\r\n    mapping(address => bool) public approvedPharmacies;\r\n\r\n    enum Status { Received, Sold, Recalled }\r\n    struct PharmacyRecord {\r\n        string medicineId;\r\n        address pharmacy;\r\n        uint256 receivedAt;\r\n        uint256 soldAt;\r\n        Status status;\r\n    }\r\n\r\n    mapping(bytes32 => PharmacyRecord) private records;\r\n    event PharmacyApproved(address indexed pharmacy, bool approved);\r\n    event MedicineReceived(string indexed medicineId, address indexed pharmacy);\r\n    event MedicineSold(string indexed medicineId, address indexed pharmacy);\r\n    event MedicineRecallFlagged(string indexed medicineId, address indexed pharmacy);\r\n\r\n    modifier onlyOwner() { require(msg.sender == owner, \"Owner only\"); _; }\r\n    modifier onlyPharmacy() { require(approvedPharmacies[msg.sender], \"Approved pharmacy only\"); _; }\r\n\r\n    constructor() { owner = msg.sender; }\r\n\r\n    function approvePharmacy(address pharmacy, bool approved) external onlyOwner {\r\n        require(pharmacy != address(0), \"Invalid address\");\r\n        approvedPharmacies[pharmacy] = approved;\r\n        emit PharmacyApproved(pharmacy, approved);\r\n    }\r\n\r\n    function receiveMedicine(string calldata medicineId) external onlyPharmacy {\r\n        require(bytes(medicineId).length > 0, \"Medicine ID required\");\r\n        bytes32 key = _key(medicineId);\r\n        require(records[key].receivedAt == 0, \"Already received by a pharmacy\");\r\n        records[key] = PharmacyRecord(medicineId, msg.sender, block.timestamp, 0, Status.Received);\r\n        emit MedicineReceived(medicineId, msg.sender);\r\n    }\r\n\r\n    function markSold(string calldata medicineId) external onlyPharmacy {\r\n        PharmacyRecord storage record = records[_key(medicineId)];\r\n        require(record.receivedAt != 0, \"Medicine not received\");\r\n        require(record.pharmacy == msg.sender, \"Not the receiving pharmacy\");\r\n        require(record.status == Status.Received, \"Not available for sale\");\r\n        record.status = Status.Sold;\r\n        record.soldAt = block.timestamp;\r\n        emit MedicineSold(medicineId, msg.sender);\r\n    }\r\n\r\n    function flagRecall(string calldata medicineId) external onlyOwner {\r\n        PharmacyRecord storage record = records[_key(medicineId)];\r\n        require(record.receivedAt != 0, \"Medicine not received\");\r\n        require(record.status != Status.Sold, \"Already sold; handle via recall notice\");\r\n        record.status = Status.Recalled;\r\n        emit MedicineRecallFlagged(medicineId, record.pharmacy);\r\n    }\r\n\r\n    function getRecord(string calldata medicineId) external view returns (PharmacyRecord memory) {\r\n        return records[_key(medicineId)];\r\n    }\r\n\r\n    function _key(string calldata medicineId) private pure returns (bytes32) {\r\n        return keccak256(bytes(medicineId));\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

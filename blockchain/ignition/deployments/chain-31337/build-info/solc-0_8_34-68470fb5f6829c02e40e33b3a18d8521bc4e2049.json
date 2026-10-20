@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-68470fb5f6829c02e40e33b3a18d8521bc4e2049",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.16.0"
+  },
+  "userSourceNameMap": {
+    "contracts/DistributorModule.sol": "project/contracts/DistributorModule.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/DistributorModule.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\n/// @notice Standalone supply-chain handoff log for the MediChain project.\r\n/// @dev This is an additive module. It does not modify or replace MedicineRegistry.sol.\r\ncontract DistributorModule {\r\n    address public owner;\r\n\r\n    struct Handoff {\r\n        string medicineId;\r\n        address from;\r\n        address to;\r\n        uint256 timestamp;\r\n        string note;\r\n    }\r\n\r\n    mapping(address => bool) public approvedDistributors;\r\n    mapping(address => bool) public approvedPharmacies;\r\n    Handoff[] private handoffs;\r\n    mapping(string => uint256[]) private handoffsByMedicine;\r\n\r\n    event DistributorApprovalChanged(address indexed distributor, bool approved);\r\n    event PharmacyApprovalChanged(address indexed pharmacy, bool approved);\r\n    event MedicineHandedOff(string indexed medicineId, address indexed from, address indexed to, uint256 timestamp);\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Owner only\");\r\n        _;\r\n    }\r\n\r\n    constructor() { owner = msg.sender; }\r\n\r\n    function approveDistributor(address account, bool approved) external onlyOwner {\r\n        require(account != address(0), \"Invalid address\");\r\n        approvedDistributors[account] = approved;\r\n        emit DistributorApprovalChanged(account, approved);\r\n    }\r\n\r\n    function approvePharmacy(address account, bool approved) external onlyOwner {\r\n        require(account != address(0), \"Invalid address\");\r\n        approvedPharmacies[account] = approved;\r\n        emit PharmacyApprovalChanged(account, approved);\r\n    }\r\n\r\n    function handoffToDistributor(string calldata medicineId, address recipient, string calldata note) external {\r\n        require(bytes(medicineId).length > 0, \"Medicine ID required\");\r\n        require(approvedDistributors[msg.sender], \"Sender is not an approved distributor\");\r\n        require(approvedDistributors[recipient], \"Recipient is not an approved distributor\");\r\n        _recordHandoff(medicineId, recipient, note);\r\n    }\r\n\r\n    function handoffToPharmacy(string calldata medicineId, address recipient, string calldata note) external {\r\n        require(bytes(medicineId).length > 0, \"Medicine ID required\");\r\n        require(approvedDistributors[msg.sender], \"Sender is not an approved distributor\");\r\n        require(approvedPharmacies[recipient], \"Recipient is not an approved pharmacy\");\r\n        _recordHandoff(medicineId, recipient, note);\r\n    }\r\n\r\n    function _recordHandoff(string calldata medicineId, address recipient, string calldata note) private {\r\n        uint256 index = handoffs.length;\r\n        handoffs.push(Handoff(medicineId, msg.sender, recipient, block.timestamp, note));\r\n        handoffsByMedicine[medicineId].push(index);\r\n        emit MedicineHandedOff(medicineId, msg.sender, recipient, block.timestamp);\r\n    }\r\n\r\n    function getHandoffCount() external view returns (uint256) { return handoffs.length; }\r\n\r\n    function getHandoff(uint256 index) external view returns (Handoff memory) {\r\n        require(index < handoffs.length, \"Invalid index\");\r\n        return handoffs[index];\r\n    }\r\n\r\n    function getMedicineHandoffIndices(string calldata medicineId) external view returns (uint256[] memory) {\r\n        return handoffsByMedicine[medicineId];\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

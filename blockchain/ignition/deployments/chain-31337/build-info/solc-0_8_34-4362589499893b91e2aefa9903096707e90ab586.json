@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-4362589499893b91e2aefa9903096707e90ab586",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.16.0"
+  },
+  "userSourceNameMap": {
+    "contracts/AdminModule.sol": "project/contracts/AdminModule.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/AdminModule.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\n/// @notice Minimal admin register for approved supply-chain participants and reports.\r\n/// @dev This is a new standalone module; it does not edit the existing project contracts.\r\ncontract AdminModule {\r\n    address public owner;\r\n    enum Role { None, Manufacturer, Distributor, Pharmacy }\r\n    struct Participant { Role role; bool active; }\r\n    struct Report { string medicineId; address reporter; string reason; uint256 timestamp; bool reviewed; }\r\n\r\n    mapping(address => Participant) public participants;\r\n    Report[] private reports;\r\n\r\n    event ParticipantUpdated(address indexed account, Role role, bool active);\r\n    event SuspiciousMedicineReported(uint256 indexed reportId, string medicineId, address indexed reporter);\r\n    event ReportReviewed(uint256 indexed reportId);\r\n\r\n    modifier onlyOwner() { require(msg.sender == owner, \"Owner only\"); _; }\r\n    constructor() { owner = msg.sender; }\r\n\r\n    function setParticipant(address account, Role role, bool active) external onlyOwner {\r\n        require(account != address(0), \"Invalid address\");\r\n        require(role != Role.None || !active, \"Active participant needs a role\");\r\n        participants[account] = Participant(role, active);\r\n        emit ParticipantUpdated(account, role, active);\r\n    }\r\n\r\n    function reportSuspiciousMedicine(string calldata medicineId, string calldata reason) external {\r\n        require(bytes(medicineId).length > 0, \"Medicine ID required\");\r\n        require(bytes(reason).length > 0, \"Reason required\");\r\n        uint256 reportId = reports.length;\r\n        reports.push(Report(medicineId, msg.sender, reason, block.timestamp, false));\r\n        emit SuspiciousMedicineReported(reportId, medicineId, msg.sender);\r\n    }\r\n\r\n    function reviewReport(uint256 reportId) external onlyOwner {\r\n        require(reportId < reports.length, \"Invalid report ID\");\r\n        require(!reports[reportId].reviewed, \"Already reviewed\");\r\n        reports[reportId].reviewed = true;\r\n        emit ReportReviewed(reportId);\r\n    }\r\n\r\n    function getReportCount() external view returns (uint256) { return reports.length; }\r\n    function getReport(uint256 reportId) external view returns (Report memory) {\r\n        require(reportId < reports.length, \"Invalid report ID\");\r\n        return reports[reportId];\r\n    }\r\n    function isApprovedManufacturer(address account)\r\n    external\r\n    view\r\n    returns (bool)\r\n{\r\n    return participants[account].role == Role.Manufacturer\r\n        && participants[account].active;\r\n}\r\n}\r\n"
+      }
+    }
+  }
+}

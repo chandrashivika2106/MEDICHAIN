@@ -3,6 +3,9 @@ pragma solidity ^0.8.24;
 
 contract MedicineRegistry {
 
+    address public owner;
+    address public adminModuleAddress;
+
     struct Medicine {
         string id;
         string name;
@@ -23,6 +26,18 @@ contract MedicineRegistry {
         address registeredBy
     );
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Owner only");
+        _;
+    }
+
+    constructor(address _adminModuleAddress) {
+        require(_adminModuleAddress != address(0), "Invalid admin address");
+
+        owner = msg.sender;
+        adminModuleAddress = _adminModuleAddress;
+    }
+
     function addMedicine(
         string memory _id,
         string memory _name,
@@ -31,6 +46,13 @@ contract MedicineRegistry {
         string memory _manufacturingDate,
         string memory _expiryDate
     ) public {
+        require(
+            IAdminModule(adminModuleAddress)
+                .isApprovedManufacturer(msg.sender),
+            "Approved manufacturer only"
+        );
+
+        require(bytes(_id).length > 0, "Medicine ID required");
         require(!medicines[_id].exists, "Medicine already registered");
 
         medicines[_id] = Medicine(
@@ -66,7 +88,13 @@ contract MedicineRegistry {
         returns (Medicine memory)
     {
         require(medicines[_id].exists, "Medicine not found");
-
         return medicines[_id];
     }
+}
+
+interface IAdminModule {
+    function isApprovedManufacturer(address account)
+        external
+        view
+        returns (bool);
 }

@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-93422f0fc456bd97fedf124b3f296cbfac5a1fb9",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.16.0"
+  },
+  "userSourceNameMap": {
+    "contracts/MedicineRegistry.sol": "project/contracts/MedicineRegistry.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/MedicineRegistry.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\ncontract MedicineRegistry {\r\n\r\n    address public owner;\r\n    address public adminModuleAddress;\r\n\r\n    struct Medicine {\r\n        string id;\r\n        string name;\r\n        string batchNumber;\r\n        string manufacturer;\r\n        string manufacturingDate;\r\n        string expiryDate;\r\n        address registeredBy;\r\n        bool exists;\r\n    }\r\n\r\n    mapping(string => Medicine) private medicines;\r\n\r\n    event MedicineRegistered(\r\n        string id,\r\n        string name,\r\n        string batchNumber,\r\n        address registeredBy\r\n    );\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Owner only\");\r\n        _;\r\n    }\r\n\r\n    constructor(address _adminModuleAddress) {\r\n        require(_adminModuleAddress != address(0), \"Invalid admin address\");\r\n\r\n        owner = msg.sender;\r\n        adminModuleAddress = _adminModuleAddress;\r\n    }\r\n\r\n    function addMedicine(\r\n        string memory _id,\r\n        string memory _name,\r\n        string memory _batchNumber,\r\n        string memory _manufacturer,\r\n        string memory _manufacturingDate,\r\n        string memory _expiryDate\r\n    ) public {\r\n        require(\r\n            IAdminModule(adminModuleAddress)\r\n                .isApprovedManufacturer(msg.sender),\r\n            \"Approved manufacturer only\"\r\n        );\r\n\r\n        require(bytes(_id).length > 0, \"Medicine ID required\");\r\n        require(!medicines[_id].exists, \"Medicine already registered\");\r\n\r\n        medicines[_id] = Medicine(\r\n            _id,\r\n            _name,\r\n            _batchNumber,\r\n            _manufacturer,\r\n            _manufacturingDate,\r\n            _expiryDate,\r\n            msg.sender,\r\n            true\r\n        );\r\n\r\n        emit MedicineRegistered(\r\n            _id,\r\n            _name,\r\n            _batchNumber,\r\n            msg.sender\r\n        );\r\n    }\r\n\r\n    function verifyMedicine(string memory _id)\r\n        public\r\n        view\r\n        returns (bool)\r\n    {\r\n        return medicines[_id].exists;\r\n    }\r\n\r\n    function getMedicine(string memory _id)\r\n        public\r\n        view\r\n        returns (Medicine memory)\r\n    {\r\n        require(medicines[_id].exists, \"Medicine not found\");\r\n        return medicines[_id];\r\n    }\r\n}\r\n\r\ninterface IAdminModule {\r\n    function isApprovedManufacturer(address account)\r\n        external\r\n        view\r\n        returns (bool);\r\n}"
+      }
+    }
+  }
+}
