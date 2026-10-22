@@ -1,3 +1,10 @@
+/* =========================================================
+   MEDICHAIN — ORIGINAL SITE STYLING + POLISHED FORMS
+   Homepage and customer page styles are preserved.
+   Manufacturer/admin/distributor/pharmacy form styles are
+   scoped to their sections to avoid changing the homepage.
+   ========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -289,6 +296,8 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* Customer verification result cards */
 .result-card {
   margin-top: 20px;
   padding: 18px;
@@ -345,9 +354,10 @@ button {
   color: #b43d30;
   font-size: 12px;
 }
-/* ============================= */
-/* ROLE SELECTION SCREEN */
-/* ============================= */
+
+/* =========================================================
+   ORIGINAL ROLE SELECTION SCREEN — preserved
+   ========================================================= */
 
 .role-screen {
   min-height: calc(100vh - 72px);
@@ -363,7 +373,7 @@ button {
 
 .role-content {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1120px;
   text-align: center;
 }
 
@@ -397,20 +407,32 @@ button {
 
 .role-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  max-width: 820px;
-  margin: auto;
+  /* Three balanced cards across, with the last two centered below. */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1080px;
+  margin: 32px auto 0;
 }
 
 .role-card {
-  padding: 38px 35px;
+  grid-column: span 2;
+  min-width: 0;
+  padding: 32px 28px;
   background: white;
   border: 1px solid #dceced;
   border-radius: 22px;
   box-shadow: 0 15px 45px rgba(25, 83, 90, 0.08);
   text-align: center;
   transition: all 0.25s ease;
+}
+
+.role-card:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.role-card:nth-child(5) {
+  grid-column: 4 / span 2;
 }
 
 .role-card:hover {
@@ -455,21 +477,319 @@ button {
   font-weight: 700;
 }
 
-/* Mobile */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
+  .role-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 720px;
+    gap: 20px;
+  }
+
+  .role-card,
+  .role-card:nth-child(4),
+  .role-card:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .role-card:last-child {
+    grid-column: 1 / -1;
+    width: calc(50% - 10px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 600px) {
   .role-screen {
-    padding: 45px 20px;
+    padding: 38px 16px;
   }
 
   .role-content h1 {
-    font-size: 38px;
+    font-size: 36px;
+    letter-spacing: -1px;
+  }
+
+  .role-content > p {
+    font-size: 15px;
+  }
+
+  .role-content h2 {
+    margin: 30px 0 18px;
   }
 
   .role-cards {
     grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 22px;
   }
 
-  .role-card {
-    padding: 30px 25px;
+  .role-card,
+  .role-card:last-child {
+    grid-column: auto;
+    width: 100%;
+    padding: 25px 22px;
+  }
+
+  .role-card p {
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   NAVIGATION BACK BUTTON — polished without affecting cards
+   ========================================================= */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px 0 0 7%;
+  min-height: 42px;
+  padding: 11px 17px;
+  background: #ffffff;
+  color: #08777d;
+  border: 1px solid #cfe3e5;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(18, 63, 70, 0.06);
+  transition: background .18s ease, border-color .18s ease,
+    color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.back-btn:hover {
+  background: #eaf7f6;
+  border-color: #8fcacc;
+  color: #075e65;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 16px rgba(18, 63, 70, 0.10);
+}
+
+.back-btn:focus-visible {
+  outline: 3px solid rgba(11, 133, 139, 0.22);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   FORM PAGES — modern styling, scoped so homepage stays same
+   ========================================================= */
+
+.registration-section {
+  width: 100%;
+  padding: 28px 22px 54px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.registration-section .registration-card {
+  width: min(850px, 100%);
+  padding: clamp(24px, 4vw, 42px);
+  background: #ffffff;
+  border: 1px solid #dceced;
+  border-radius: 22px;
+  box-shadow: 0 18px 48px rgba(25, 83, 90, 0.10);
+}
+
+.registration-section .registration-header {
+  margin-bottom: 27px;
+}
+
+.registration-section .section-badge {
+  display: inline-block;
+  padding: 8px 13px;
+  border-radius: 30px;
+  background: #e4f5f4;
+  color: #08777d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .6px;
+}
+
+.registration-section .registration-header h2 {
+  margin: 13px 0 8px;
+  color: #123f46;
+  font-size: clamp(27px, 3vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -.6px;
+}
+
+.registration-section .registration-header p {
+  margin: 0;
+  color: #657b80;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.registration-section .registration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 22px;
+  margin: 28px 0;
+}
+
+.registration-section .registration-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.registration-section .registration-grid label {
+  color: #24484e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.registration-section .registration-grid input,
+.registration-section .registration-grid select,
+.registration-section .registration-grid textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #cbdcde;
+  border-radius: 10px;
+  outline: none;
+  background: #fbfdfd;
+  color: #12343b;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color .2s ease, box-shadow .2s ease,
+    background .2s ease;
+}
+
+.registration-section .registration-grid input::placeholder {
+  color: #9aabad;
+}
+
+.registration-section .registration-grid input:focus,
+.registration-section .registration-grid select:focus,
+.registration-section .registration-grid textarea:focus {
+  border-color: #0b858b;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(11, 133, 139, .10);
+}
+
+.registration-section .register-btn {
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #0b858b;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(11, 133, 139, .16);
+  transition: background .2s ease, transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.registration-section .register-btn:hover {
+  background: #096e75;
+  transform: translateY(-1px);
+  box-shadow: 0 11px 22px rgba(11, 133, 139, .22);
+}
+
+.registration-section .register-btn:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Styles for the other role dashboards */
+.registration-section .registration-card > h3 {
+  color: #123f46;
+  margin-top: 26px;
+}
+
+.registration-section .registration-card ul {
+  padding-left: 22px;
+  color: #657b80;
+  line-height: 1.9;
+}
+
+.registration-section .registration-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.registration-section .registration-card th,
+.registration-section .registration-card td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e2eeee;
+  overflow-wrap: anywhere;
+}
+
+.registration-section .registration-card th {
+  background: #f1f8f8;
+  color: #31525c;
+}
+
+.registration-section .registration-card > button:not(.back-btn) {
+  margin-top: 8px;
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px solid #b8d9da;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #08777d;
+}
+
+.registration-section .registration-card > button:not(.back-btn):hover {
+  background: #eaf7f6;
+}
+
+.registration-section .registration-card > button.register-btn {
+  background: #0b858b;
+  color: #ffffff;
+  border: 0;
+  min-height: 50px;
+}
+
+.registration-section .registration-card > button.register-btn:hover {
+  background: #096e75;
+}
+
+.registration-section .secure-note,
+.registration-section .status-note {
+  margin-top: 18px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: #f1f8f8;
+  color: #536f74;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .registration-section {
+    padding: 20px 14px 38px;
+  }
+
+  .registration-section .registration-card {
+    padding: 23px 18px;
+    border-radius: 17px;
+  }
+
+  .registration-section .registration-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .back-btn {
+    margin-left: 14px;
+  }
+
+  .registration-section .registration-card th,
+  .registration-section .registration-card td {
+    padding: 9px 7px;
+    font-size: 12px;
   }
 }
